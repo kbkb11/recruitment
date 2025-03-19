@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: recutiment
+
+  mvc:
+    favicon:
+      enable: false
+
+  servlet:
+    multipart:
+      max-file-size: 5000MB
+      max-request-size: 2000MB
+
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/netDisk?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8
+    username: root
+    password: yhp0825sx
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      pool-name: HikariCPDataSource
+      minimum-idle: 5
+      idle-timeout: 180000
+      maximum-pool-size: 10
+      auto-commit: true
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+
+  data:
+    redis:
+      host: 47.96.135.48
+      port: 6379
+      password: yhp0825sx
+      timeout: 15000
+      jedis:
+        pool:
+          max-active: 10
+          max-idle: 10
+          min-idle: 1
+          time-between-eviction-runs: 10s
+
+  rabbitmq:
+    host: 47.96.135.48
+    port: 5672
+    username: guest
+    password: guest
+
+server:
+  port: 9955
+  baseUrl: http://localhost:9955
+
+log:
+  root:
+    level: info
+
+admin:
+  email: test@qq.com
+
+# MyBatis Plus
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.netDisk.mapper

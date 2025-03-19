@@ -1,0 +1,32 @@
+my-crawler-system/
+├── src/main/java/
+│   ├── com/mycrawler/
+│   │   ├── config/               # 配置类
+│   │   │   ├── MyBatisPlusConfig.java # MyBatis-Plus 配置
+│   │   │   ├── AppConfig.java
+│   │   │   └── QuartzConfig.java
+│   │   ├── controller/           # 用户接口控制器
+│   │   │   ├── ApiController.java # 提供爬虫任务的触发API
+│   │   │   └── WebController.java # 提供前端接口
+│   │   ├── crawler/              # 爬虫模块
+│   │   │   ├── base/
+│   │   │   ├── impl/
+│   │   │   └── manager/
+│   │   ├── service/              # 服务层
+│   │   │   ├── CrawlerService.java
+│   │   │   ├── ProductService.java  # 产品业务逻辑
+│   │   │   ├── SiteService.java     # 网站业务逻辑
+│   │   │   └── TaskSchedulerService.java
+│   │   ├── mapper/               # 数据访问层
+│   │   │   ├── ProductMapper.java # 产品数据的存储与查询
+│   │   │   └── SiteMapper.java    # 网站数据的存储与查询
+│   │   ├── model/                # 数据模型
+│   │   │   ├── Product.java
+│   │   │   ├── Site.java
+│   │   │   └── TaskStatus.java
+│   │   └── Application.java      # 启动类
+├── src/main/resources/
+│   ├── application.properties    # 应用配置文件
+│   ├── quartz.properties         # Quartz任务调度配置文件
+├── src/test/java/
+└── pom.xml
