@@ -16,9 +16,6 @@ public interface AdminService {
     // 更新管理员信息
     Result updateAdmin(Admin admin);
     
-    // 删除管理员
-    Result deleteAdmin(Long id);
-    
     // 获取所有管理员列表
     List<Admin> getAllAdmins();
     

@@ -22,6 +22,7 @@ public class NormalUser {
     private String username;
     private String password;
     private String phoneNumber;
+    private boolean enabled;
     private Timestamp createdAt;
     private Timestamp updatedAt;
     private Gender gender;

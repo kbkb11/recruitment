@@ -5,6 +5,7 @@ CREATE TABLE `normal_user` (
   `username` VARCHAR(50) NOT NULL UNIQUE,
   `password` VARCHAR(255) NOT NULL,
   `phone_number` VARCHAR(20) NOT NULL UNIQUE,
+  `enabled BOOLEAN` DEFAULT true,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   -- 普通用户专有字段
@@ -19,6 +20,7 @@ CREATE TABLE `enterprise_user` (
   `username` VARCHAR(50) NOT NULL UNIQUE,
   `password` VARCHAR(255) NOT NULL,
   `phone_number` VARCHAR(20) NOT NULL UNIQUE,
+  `enabled BOOLEAN` DEFAULT true,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   -- 企业用户专有字段
@@ -181,15 +183,18 @@ CREATE TABLE `community_post` (
 );
 
 -- 社区评论表：存储用户对帖子进行评论（或评论回复）
-CREATE TABLE `community_comment` (
-  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- 评论ID
-  `post_id` INT UNSIGNED NOT NULL,                -- 评论所属的帖子ID
-  `user_id` INT UNSIGNED NOT NULL,                -- 发表评论的用户ID
-  `content` TEXT NOT NULL,                        -- 评论内容
-  `parent_comment_id` INT UNSIGNED DEFAULT NULL,  -- 父评论ID（回复时使用）
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- 评论时间
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- 更新时间
-  FOREIGN KEY (`post_id`) REFERENCES `community_post`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`user_id`) REFERENCES `normal_user`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`parent_comment_id`) REFERENCES `community_comment`(`id`) ON DELETE SET NULL
+CREATE TABLE community_comment (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    post_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    parent_id BIGINT,
+    root_id BIGINT,
+    content TEXT NOT NULL,
+    level INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES community_post(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES normal_user(id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_id) REFERENCES community_comment(id) ON DELETE SET NULL,
+    FOREIGN KEY (root_id) REFERENCES community_comment(id) ON DELETE SET NULL,
 );

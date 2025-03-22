@@ -94,4 +94,9 @@ public class JobServiceImpl implements JobService {
         return jobMapper.selectByEnterpriseIdAndStatus(enterpriseId, status); // 使用 selectByEnterpriseIdAndStatus
     }
 
+    @Override
+    public List<Job> searchByKeyword(String keyword) {
+        return jobMapper.searchByKeyword(keyword); // 使用 searchByKeyword
+    }
+
 }

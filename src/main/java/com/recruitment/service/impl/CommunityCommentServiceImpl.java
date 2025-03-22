@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Service
@@ -17,12 +18,14 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
     @Autowired
     private CommunityCommentMapper commentMapper;
 
+    private static final int MAX_LEVEL = 2;
+
     @Override
     @Transactional
     public CommunityComment addComment(CommunityComment comment) {
-        // 设置创建时间和更新时间
-        comment.setCreatedAt(LocalDateTime.now());
-        comment.setUpdatedAt(LocalDateTime.now());
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+        comment.setCreatedAt(now);
+        comment.setUpdatedAt(now);
         
         // 如果是回复其他评论
         if (comment.getParentId() != null) {
@@ -32,14 +35,19 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
                 throw new RuntimeException("父评论不存在");
             }
             
-            // 设置层级：如果父评论是第二层或以上，保持在第二层
-            comment.setLevel(Math.min(parentComment.getLevel() + 1, 2));
-            
-            // 设置根评论ID
-            if (parentComment.getRootId() != null) {
-                comment.setRootId(parentComment.getRootId());
-            } else {
+            // 如果父评论是第一层评论，设置为第二层
+            if (parentComment.getLevel() == 1) {
+                comment.setLevel(2);
                 comment.setRootId(parentComment.getId());
+            } 
+            // 如果父评论是第二层评论，保持在第二层，但更新父评论引用
+            else if (parentComment.getLevel() == 2) {
+                comment.setLevel(2);
+                comment.setRootId(parentComment.getRootId());
+            }
+            // 不允许回复超过二层的评论
+            else {
+                throw new RuntimeException("评论层级已达到上限");
             }
         } else {
             // 直接评论帖子
@@ -60,8 +68,8 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
             throw new RuntimeException("评论不存在或无权限删除");
         }
         
-        // 如果是根评论，删除所有子评论
-        if (comment.getRootId() == null) {
+        // 如果是第一层评论，删除所有回复
+        if (comment.getLevel() == 1) {
             LambdaQueryWrapper<CommunityComment> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(CommunityComment::getRootId, commentId);
             commentMapper.delete(wrapper);
@@ -76,7 +84,7 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         Page<CommunityComment> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<CommunityComment> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(CommunityComment::getPostId, postId)
-               .isNull(CommunityComment::getParentId)  // 只获取直接评论
+               .eq(CommunityComment::getLevel, 1)  // 只获取第一层评论
                .orderByDesc(CommunityComment::getCreatedAt);
         
         return commentMapper.selectPage(page, wrapper);
@@ -84,21 +92,41 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
 
     @Override
     public Page<CommunityComment> getCommentReplies(Long commentId, Integer pageNum, Integer pageSize) {
+        // 获取评论信息
+        CommunityComment comment = commentMapper.selectById(commentId);
+        if (comment == null) {
+            throw new RuntimeException("评论不存在");
+        }
+
         Page<CommunityComment> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<CommunityComment> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(CommunityComment::getParentId, commentId)
-               .orderByAsc(CommunityComment::getCreatedAt);
         
+        // 如果是第一层评论，获取其所有回复
+        if (comment.getLevel() == 1) {
+            wrapper.eq(CommunityComment::getRootId, commentId);
+        }
+        // 如果是第二层评论，获取同一个根评论下的所有第二层评论
+        else if (comment.getLevel() == 2) {
+            wrapper.eq(CommunityComment::getRootId, comment.getRootId())
+                   .eq(CommunityComment::getLevel, 2);
+        }
+        
+        wrapper.orderByAsc(CommunityComment::getCreatedAt);
         return commentMapper.selectPage(page, wrapper);
     }
 
     @Override
     public Page<CommunityComment> getCommentTree(Long postId, Integer pageNum, Integer pageSize) {
-        Page<CommunityComment> page = new Page<>(pageNum, pageSize);
-        LambdaQueryWrapper<CommunityComment> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(CommunityComment::getPostId, postId)
-               .orderByAsc(CommunityComment::getCreatedAt);
+        // 先获取所有一级评论
+        Page<CommunityComment> firstLevelPage = getPostComments(postId, pageNum, pageSize);
         
-        return commentMapper.selectPage(page, wrapper);
+        // 对于每个一级评论，获取其二级评论
+        for (CommunityComment comment : firstLevelPage.getRecords()) {
+            Page<CommunityComment> replies = getCommentReplies(comment.getId(), 1, 50);
+            // 这里可以将回复添加到一级评论的某个字段中，需要在实体类中添加相应字段
+            // comment.setReplies(replies.getRecords());
+        }
+        
+        return firstLevelPage;
     }
 } 

@@ -73,7 +73,7 @@ public class ApplicationController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/applicationDetail/{id}")
     public Result getApplicationDetail(@PathVariable Long id) {
         try {
             Application application = applicationService.getApplicationDetail(id);
@@ -85,7 +85,7 @@ public class ApplicationController {
         }
     }
 
-    @PostMapping
+    @PostMapping("/createStage")
     public Result createStage(@RequestBody ApplicationStage stage) {
         try {
             boolean success = stageService.createStage(stage);
@@ -122,7 +122,7 @@ public class ApplicationController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/applicationStageDetail/{id}")
     public Result getStageDetail(@PathVariable Long id) {
         try {
             ApplicationStage stage = stageService.getStageDetail(id);

@@ -28,12 +28,4 @@ public class CommunityComment {
     private Integer level;    // 评论层级，用于控制盖楼深度
     private Timestamp createdAt;
     private Timestamp updatedAt;
-
-    /**
-     * 检查评论层级是否超过最大限制
-     * @return 如果超过最大层级返回true，否则返回false
-     */
-    public boolean isExceedMaxLevel() {
-        return this.level != null && this.level > MAX_COMMENT_LEVEL;
-    }
 }
