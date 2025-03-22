@@ -24,6 +24,7 @@ public class RecruitmentAd {
     private String content;
     private Date startDate;
     private Date endDate;
+    private Integer status; // 0: 待审核, 1: 已通过, 2: 已拒绝
     private Timestamp createdAt;
     private Timestamp updatedAt;
 }

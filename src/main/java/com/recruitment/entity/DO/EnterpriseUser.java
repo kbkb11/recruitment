@@ -19,7 +19,7 @@ public class EnterpriseUser {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     private String username;
-    private String password; // 强烈建议：实际应用中，不要直接存储明文密码！至少要加盐哈希！
+    private String password;
     private String phoneNumber;
     private Timestamp createdAt;
     private Timestamp updatedAt;

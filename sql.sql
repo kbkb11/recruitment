@@ -72,15 +72,29 @@ CREATE TABLE `resume` (
 
 -- 申请表：存储用户的岗位申请记录，关联到 normal_user 表的普通用户、job 表的岗位信息和 resume 表的简历
 CREATE TABLE `application` (
-  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,  -- 申请ID
-  `user_id` INT UNSIGNED NOT NULL,                -- 申请用户ID
-  `job_id` INT UNSIGNED NOT NULL,                 -- 申请的岗位ID
-  `resume_id` INT UNSIGNED NOT NULL,              -- 申请时使用的简历ID
-  `apply_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- 申请日期
-  `status` VARCHAR(50),                           -- 申请状态
-  FOREIGN KEY (`user_id`) REFERENCES `normal_user`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`job_id`) REFERENCES `job`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`resume_id`) REFERENCES `resume`(`id`) ON DELETE CASCADE
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,       -- 申请ID
+    `user_id` BIGINT UNSIGNED NOT NULL,                      -- 关联普通用户ID
+    `job_id` BIGINT UNSIGNED NOT NULL,                       -- 关联岗位ID
+    `resume_id` BIGINT UNSIGNED NOT NULL,                    -- 关联简历ID
+    `apply_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,        -- 申请日期
+    `status` ENUM('PENDING', 'REVIEWED', 'INTERVIEW', 'REJECTED', 'OFFERED', 'ACCEPTED', 'DECLINED')
+        NOT NULL DEFAULT 'PENDING',                          -- 申请状态
+    FOREIGN KEY (`user_id`) REFERENCES `normal_user`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`job_id`) REFERENCES `job`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`resume_id`) REFERENCES `resume`(`id`) ON DELETE CASCADE
+);
+
+
+-- 申请阶段记录表：存储每个岗位申请在招聘流程中的不同阶段记录
+CREATE TABLE `application_stage` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,      -- 阶段记录ID
+    `application_id` BIGINT UNSIGNED NOT NULL,              -- 关联申请ID
+    `stage_name` VARCHAR(50) NOT NULL,                      -- 阶段名称
+    `status` ENUM('pending', 'passed', 'failed') NOT NULL DEFAULT 'pending', -- 阶段状态
+    `remarks` VARCHAR(255),                                 -- 备注信息
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,       -- 创建时间
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新时间
+    FOREIGN KEY (`application_id`) REFERENCES `application`(`id`) ON DELETE CASCADE
 );
 
 -- 友情链接表：存储友情网站的链接信息

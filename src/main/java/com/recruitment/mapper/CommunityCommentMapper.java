@@ -5,6 +5,5 @@ import com.recruitment.entity.DO.CommunityComment;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface CommunityCommentMapper extends BaseMapper<CommunityComment>{
-
+public interface CommunityCommentMapper extends BaseMapper<CommunityComment> {
 }

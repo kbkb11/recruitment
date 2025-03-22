@@ -20,4 +20,7 @@ public interface JobMapper extends BaseMapper<Job> {
 
     @Select("SELECT * FROM job")
     List<Job> selectAll();
+
+    @Select("SELECT * FROM job WHERE title LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%') OR requirements LIKE CONCAT('%', #{keyword}, '%')")
+    List<Job> searchByKeyword(String keyword);
 }

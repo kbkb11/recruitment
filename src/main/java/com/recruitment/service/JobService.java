@@ -13,4 +13,7 @@ public interface JobService {
     Result deleteJob(Long id);
     List<Job> getJobsByStatus(Job.JobStatus status);
     List<Job> getJobsByEnterpriseIdAndStatus(Long enterpriseId, Job.JobStatus status);
+    
+    // 关键字搜索
+    List<Job> searchByKeyword(String keyword);
 }

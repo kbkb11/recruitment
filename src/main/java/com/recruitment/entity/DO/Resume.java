@@ -22,12 +22,12 @@ public class Resume {
     private String name;
     private Short age; // 使用 Short，因为 TINYINT UNSIGNED 在 Java 中没有直接对应的类型
     private Gender gender; // 使用枚举
-    private String education;
-    private String phoneNumber;
-    private String skills;
-    private String experience;
-    private String projects;
-    private String awards;
+    private String education; // 学历
+    private String phoneNumber; // 手机号
+    private String skills; // 技能
+    private String experience; // 工作经验
+    private String projects; // 项目经验
+    private String awards; // 获奖情况
     private Timestamp createdAt;
     private Timestamp updatedAt;
 

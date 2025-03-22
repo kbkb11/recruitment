@@ -16,12 +16,24 @@ import lombok.Builder;
 @ToString
 @Builder
 public class CommunityComment {
+    public static final int MAX_COMMENT_LEVEL = 2;  // 最大评论层级为2
+
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-    private Long postId;     // 对应 community_posts 表的 id (外键)
-    private Long userId;     // 对应 normal_users 表的 id (外键)
-    private String content;
-    private Long parentCommentId; // 父评论 ID (可以为 null)
+    private Long postId;      // 对应的帖子ID
+    private Long userId;      // 评论用户ID
+    private Long parentId;    // 父评论ID，用于实现盖楼功能，如果是直接评论帖子则为null
+    private Long rootId;      // 根评论ID，用于标识属于同一个评论树的评论
+    private String content;   // 评论内容
+    private Integer level;    // 评论层级，用于控制盖楼深度
     private Timestamp createdAt;
     private Timestamp updatedAt;
+
+    /**
+     * 检查评论层级是否超过最大限制
+     * @return 如果超过最大层级返回true，否则返回false
+     */
+    public boolean isExceedMaxLevel() {
+        return this.level != null && this.level > MAX_COMMENT_LEVEL;
+    }
 }
